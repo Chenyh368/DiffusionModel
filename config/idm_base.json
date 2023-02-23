@@ -1,0 +1,38 @@
+{
+  "train": {
+    "schedule_sampler": "uniform",
+    "lr": 1e-4,
+    "weight_decay": 0.0,
+    "lr_anneal_steps": 0,
+    "batch_size": 1,
+    "microbatch": -1,
+    "ema_rate": 0.9999,
+    "log_interval": 10,
+    "save_interval": 10000,
+    "resume_checkpoint": "",
+    "use_fp16": false,
+    "fp16_scale_growth": 1e-3,
+    "deterministic": false
+  },
+  "model": {
+    "image_size": 64,
+    "numchannels": 128,
+    "num_res_blocks": 2,
+    "num_heads": 4,
+    "num_heads_upsample": -1,
+    "attention_resolutions": "16,8",
+    "dropout": 0.0,
+    "learn_sigma": false,
+    "sigma_small": false,
+    "class_cond": false,
+    "diffusion_steps": 1000,
+    "noise_scheduler": "linear",
+    "timestep_respacing": "",
+    "use_kl": false,
+    "predict_xstart": false,
+    "rescale_timesteps": true,
+    "rescale_learned_sigmas": true,
+    "use_checkpoint": false,
+    "use_scale_shift_norm": true
+  }
+}

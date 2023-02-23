@@ -1,0 +1,46 @@
+{
+  "train": {
+    "schedule_sampler": "uniform",
+    "lr": 1e-4,
+    "weight_decay": 0.0,
+    "lr_anneal_steps": 0,
+    "batch_size": 64,
+    "microbatch": -1,
+    "ema_rate": 0.9999,
+    "log_interval": 10,
+    "save_interval": 10000,
+    "resume_checkpoint": "",
+    "use_fp16": false,
+    "fp16_scale_growth": 1e-3,
+    "deterministic": false
+  },
+  "model": {
+    "image_size": 32,
+    "num_channels": 128,
+    "num_res_blocks": 3,
+    "num_heads": 4,
+    "num_heads_upsample": -1,
+    "attention_resolutions": "16,8",
+    "dropout": 0.3,
+    "learn_sigma": true,
+    "sigma_small": false,
+    "class_cond": false,
+    "diffusion_steps": 4000,
+    "noise_scheduler": "cosine",
+    "timestep_respacing": "",
+    "use_kl": false,
+    "predict_xstart": false,
+    "rescale_timesteps": true,
+    "rescale_learned_sigmas": true,
+    "use_checkpoint": false,
+    "use_scale_shift_norm": true
+  },
+  "test": {
+    "num_samples": 10000,
+    "clip_denoised": true,
+    "batch_size": 16,
+    "use_ddim": false,
+    "model_path": "/import/home2/yhchenmath/Log/diffusion/cifar10/0/checkpoints/ema_0.9999_050000.pt"
+  }
+}
+

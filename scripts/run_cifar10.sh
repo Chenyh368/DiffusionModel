@@ -1,0 +1,1 @@
+python train_improved_diffusion.py --run_name cifar10 --mode train --gpu 4,6 --dataset_dir cifar10 --json_path ./config/idm_cifar10.json
