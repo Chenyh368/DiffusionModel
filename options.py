@@ -23,7 +23,7 @@ class Options():
         parser.add_argument('--model_name', type=str, default='improved_diffusion',
                             help='chooses which model to use. [improved_gaussian_diffusion |]')
         # ============== Additional =====================
-        parser.add_argument('--mode', default="train", type=str, choices=['train', 'test'])
+        parser.add_argument('--mode', default="train", type=str, choices=['train', 'eval'])
 
         return parser
 

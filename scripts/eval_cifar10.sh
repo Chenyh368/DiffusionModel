@@ -1,0 +1,1 @@
+python ./python_scripts/eval_improved_diffusion.py --run_name cifar10_eval --mode eval --gpu 1,5 --json_path ./config/idm_cifar10.json

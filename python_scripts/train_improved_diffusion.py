@@ -1,3 +1,6 @@
+import sys
+sys.path.append("./")
+
 from options import Options, HyperParams
 from utils.experiman import ExperiMan
 import os
@@ -6,6 +9,7 @@ import torch.multiprocessing as mp
 import logging
 import torch.distributed as dist
 from models import create_model
+from utils import dist_util
 from models.improved_diffusion_model import Trainer
 from data import create_dataset
 
@@ -13,9 +17,9 @@ def main(opt, manager):
     """Assume Single Node Multi GPUs Training Only"""
     assert torch.cuda.is_available(), "CPU training is not allowed."
     n_gpus = torch.cuda.device_count()
-    # TODO: Run train.py simultaneously with different port
     os.environ['MASTER_ADDR'] = 'localhost'
-    os.environ['MASTER_PORT'] = '80001'
+    os.environ['MASTER_PORT'] = str(dist_util.find_free_port())
+    print(f"======> Using Address: {os.environ.get('MASTER_ADDR')}:{os.environ.get('MASTER_PORT')}")
     mp.spawn(run, nprocs=n_gpus, args=(n_gpus, opt, manager))
 
 def run(rank, n_gpus, opt, manager):

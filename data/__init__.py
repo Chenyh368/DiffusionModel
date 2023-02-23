@@ -38,7 +38,7 @@ def create_dataset(opt, manager):
     dataloader = torch.utils.data.DataLoader(
         dataset,
         batch_size=opt.train.batch_size,
-        shuffle=opt.train.deterministic,
+        shuffle=opt.train.deterministic if opt.mode == "train" else opt.eval.deterministic,
         #TODO: Find why here num_workers has to be zero
         num_workers=0,
         drop_last=True)

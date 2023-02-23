@@ -2,6 +2,9 @@
 Generate a large batch of image samples from a model and save them as a large
 numpy array. This can be used to produce samples for FID evaluation.
 """
+import sys
+sys.path.append("./")
+
 import numpy as np
 from options import Options, HyperParams
 from utils.experiman import ExperiMan
@@ -21,9 +24,9 @@ def main(opt, manager):
     """Assume Single Node Multi GPUs Training Only"""
     assert torch.cuda.is_available(), "CPU training is not allowed."
     n_gpus = torch.cuda.device_count()
-    # TODO: Run train.py simultaneously with different port
     os.environ['MASTER_ADDR'] = 'localhost'
-    os.environ['MASTER_PORT'] = '80000'
+    os.environ['MASTER_PORT'] = str(dist_util.find_free_port())
+    print(f"======> Using Address: {os.environ.get('MASTER_ADDR')}:{os.environ.get('MASTER_PORT')}")
     mp.spawn(run, nprocs=n_gpus, args=(n_gpus, opt, manager))
 
 def run(rank, n_gpus, opt, manager):
@@ -45,6 +48,10 @@ def run(rank, n_gpus, opt, manager):
 
     # Model
     diffusion_model = create_model(opt, manager)
+    logger.info(f"======> Load model from {opt.sample.model_path}")
+    diffusion_model.U_net.load_state_dict(
+        dist_util.load_state_dict(manager, opt.sample.model_path, map_location="cpu")
+    )
     diffusion_model.eval()
 
     all_images = []
@@ -52,24 +59,24 @@ def run(rank, n_gpus, opt, manager):
     logger.info("=============== Sampling ===============")
 
     log_steps = 0
-    while len(all_images) * opt.test.batch_size < opt.test.num_samples:
+    while len(all_images) * opt.sample.batch_size < opt.sample.num_samples:
         model_kwargs = {}
         if opt.model.class_cond:
             classes = torch.randint(
-                low=0, high=NUM_CLASSES, size=(opt.test.batch_size,), device=dist_util.dev(manager.get_rank())
+                low=0, high=NUM_CLASSES, size=(opt.sample.batch_size,), device=dist_util.dev(manager.get_rank())
             )
             model_kwargs["y"] = classes
         sample_fn = (
-            diffusion_model.diffusion.p_sample_loop if not opt.test.use_ddim else diffusion_model.diffusion.ddim_sample_loop
+            diffusion_model.diffusion.p_sample_loop if not opt.sample.use_ddim else diffusion_model.diffusion.ddim_sample_loop
         )
         sample = sample_fn(
             diffusion_model.U_net,
-            (opt.test.batch_size, 3, opt.model.image_size, opt.model.image_size),
-            clip_denoised=opt.test.clip_denoised,
+            (opt.sample.batch_size, 3, opt.model.image_size, opt.model.image_size),
+            clip_denoised=opt.sample.clip_denoised,
             model_kwargs=model_kwargs,
         )
         if manager.get_rank() == 0 and log_steps <= 10:
-            manager.log_image(opt.test.model_path.split('/')[-1], sample, log_steps)
+            manager.log_image(opt.sample.model_path.split('/')[-1], (sample+1)/2, log_steps)
             log_steps += 1
 
         sample = ((sample + 1) * 127.5).clamp(0, 255).to(torch.uint8)
@@ -85,10 +92,10 @@ def run(rank, n_gpus, opt, manager):
             ]
             dist.all_gather(gathered_labels, classes)
             all_labels.extend([labels.cpu().numpy() for labels in gathered_labels])
-        logger.info(f"======> created {len(all_images) * opt.test.batch_size} samples")
+        logger.info(f"======> created {len(all_images) * opt.sample.batch_size} samples")
 
     arr = np.concatenate(all_images, axis=0)
-    arr = arr[: opt.test.num_samples]
+    arr = arr[: opt.sample.num_samples]
     if opt.model.class_cond:
         label_arr = np.concatenate(all_labels, axis=0)
         label_arr = label_arr[: opt.model.num_samples]

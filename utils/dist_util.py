@@ -2,6 +2,7 @@ import blobfile as bf
 import torch
 import torch.distributed as dist
 import io
+import socket
 
 def load_state_dict(manager, path, **kwargs):
     """
@@ -33,3 +34,12 @@ def dev(rank):
     if torch.cuda.is_available():
         return torch.device(f"cuda:{rank}")
     return torch.device("cpu")
+
+def find_free_port():
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.bind(("", 0))
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        return s.getsockname()[1]
+    finally:
+        s.close()
