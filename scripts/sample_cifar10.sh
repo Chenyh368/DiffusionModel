@@ -1,1 +1,1 @@
-python ./python_scripts/sample_improved_diffusion.py --run_name cifar10_sample --mode eval --gpu 1,5 --json_path ./config/idm_cifar10.json
+python ./python_scripts/sample_improved_diffusion.py --run_name cifar10_sample --mode eval --gpu 4,6 --json_path ./config/idm_cifar10.json

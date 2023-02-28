@@ -1,0 +1,1 @@
+python ./python_scripts/train_improved_diffusion.py --run_name lsun_bedroom --mode train --gpu 4,6 --dataset_dir lsun/bedroom_train --json_path ./config/idm_lsun.json

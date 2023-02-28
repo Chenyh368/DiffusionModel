@@ -12,7 +12,7 @@ import logging
 from utils import dist_util
 import torch.distributed as dist
 from models import create_model
-from data import create_dataset
+from data import create_dataset, create_dataloader
 
 
 
@@ -31,10 +31,7 @@ def run(rank, n_gpus, opt, manager):
     manager.set_rank(rank)
     manager._setup_seed()
     manager._setup_logger(logging.DEBUG if rank in [-1, 0] else logging.WARN)
-    if manager.is_master():
-        manager._third_party_tools = ('tensorboard',)
-        # Set up tensorboard in master (rank == 0)
-        manager._setup_third_party_tools()
+
 
     logger = manager.get_logger()
     logger.info(f"======> N gpus / World size: {n_gpus}")
@@ -50,7 +47,14 @@ def run(rank, n_gpus, opt, manager):
     )
     diffusion_model.eval()
 
-    data = create_dataset(opt, manager)
+    # Data
+    dataset = create_dataset(opt, manager)
+    data = iter(create_dataloader(dataset, opt))
+
+    if manager.is_master():
+        manager._third_party_tools = ('tensorboard',)
+        # Set up tensorboard in master (rank == 0)
+        manager._setup_third_party_tools()
     logger.info("=============== Eval ===============")
     run_bpd_evaluation(manager, diffusion_model.U_net, diffusion_model.diffusion, data, opt.eval.num_samples, opt.eval.clip_denoised)
 

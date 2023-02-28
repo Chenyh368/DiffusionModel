@@ -1,6 +1,7 @@
 import importlib
 from data.base_dataset import BaseDataset
 import torch
+import torch.distributed as dist
 
 def find_dataset_using_name(dataset_name):
     """Import the module "data/[dataset_name]_dataset.py".
@@ -34,36 +35,18 @@ def create_dataset(opt, manager):
     dataset = dataset_class(opt, manager)
     logger = manager.get_logger()
     logger.info("======> dataset [%s] was created" % type(dataset).__name__)
+    dist.barrier()
+    logger.warn(f"======> length of dataset in rank {manager.get_rank()}: {len(dataset)}")
+    return dataset
 
+def create_dataloader(dataset, opt):
     dataloader = torch.utils.data.DataLoader(
         dataset,
         batch_size=opt.train.batch_size,
-        shuffle=opt.train.deterministic if opt.mode == "train" else opt.eval.deterministic,
-        #TODO: Find why here num_workers has to be zero
-        num_workers=0,
+        shuffle=not opt.train.deterministic if opt.mode == "train" else not opt.eval.deterministic,
+        num_workers=1,
         drop_last=True)
 
-    while True:
-        yield from dataloader
-
-
-# class CustomDatasetDataLoader():
-#     """Wrapper class of Dataset class that performs multi-threaded data loading"""
-#
-#     def __init__(self, opt, manager):
-#         self.opt = opt
-#         dataset_class = find_dataset_using_name(opt.dataset_mode)
-#         self.dataset = dataset_class(opt, manager)
-#         self.logger = manager.get_logger()
-#         self.logger.info("======> dataset [%s] was created" % type(self.dataset).__name__)
-#         self.dataloader = torch.utils.data.DataLoader(
-#             self.dataset,
-#             batch_size=opt.train.batch_size,
-#             shuffle=opt.train.deterministic,
-#             num_workers=1,
-#             drop_last=True)
-#
-#     def load_data(self):
-#         return self
+    return dataloader
 
 

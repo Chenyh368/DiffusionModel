@@ -11,7 +11,7 @@ import torch.distributed as dist
 from models import create_model
 from utils import dist_util
 from models.improved_diffusion_model import Trainer
-from data import create_dataset
+from data import create_dataset, create_dataloader
 
 def main(opt, manager):
     """Assume Single Node Multi GPUs Training Only"""
@@ -28,10 +28,6 @@ def run(rank, n_gpus, opt, manager):
     manager.set_rank(rank)
     manager._setup_seed()
     manager._setup_logger(logging.DEBUG if rank in [-1, 0] else logging.WARN)
-    if manager.is_master():
-        manager._third_party_tools = ('tensorboard',)
-        # Set up tensorboard in master (rank == 0)
-        manager._setup_third_party_tools()
 
     logger = manager.get_logger()
     logger.info(f"======> N gpus / World size: {n_gpus}")
@@ -42,8 +38,14 @@ def run(rank, n_gpus, opt, manager):
     # Model
     diffusion_model = create_model(opt, manager)
     # Data
-    data = create_dataset(opt, manager)
+    dataset = create_dataset(opt, manager)
+    data = iter(create_dataloader(dataset, opt))
+
     logger.info("=============== Training ===============")
+    if manager.is_master():
+        manager._third_party_tools = ('tensorboard',)
+        # Set up tensorboard in master (rank == 0)
+        manager._setup_third_party_tools()
     Trainer(opt, manager, diffusion_model, data).run_loop()
 
 

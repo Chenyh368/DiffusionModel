@@ -40,14 +40,14 @@
     "clip_denoised": true,
     "batch_size": 16,
     "use_ddim": false,
-    "model_path": "/import/home2/yhchenmath/Log/diffusion/cifar10/0/checkpoints/ema_0.9999_060000.pt"
+    "model_path": "/import/home2/yhchenmath/Log/diffusion/cifar10/0/checkpoints/ema_0.9999_300000.pt"
   },
   "eval": {
     "data_dir": "",
     "clip_denoised": true,
     "num_samples": 1000,
     "batch_size": 1,
-    "model_path": "/import/home2/yhchenmath/Log/diffusion/cifar10/0/checkpoints/ema_0.9999_060000.pt",
+    "model_path": "/import/home2/yhchenmath/Log/diffusion/cifar10/0/checkpoints/ema_0.9999_300000.pt",
     "deterministic": true
   }
 }
