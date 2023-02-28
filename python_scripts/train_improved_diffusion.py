@@ -11,7 +11,7 @@ import torch.distributed as dist
 from models import create_model
 from utils import dist_util
 from models.improved_diffusion_model import Trainer
-from data import create_dataset, create_dataloader
+from data import create_dataset, create_dataloader_generator
 
 def main(opt, manager):
     """Assume Single Node Multi GPUs Training Only"""
@@ -39,7 +39,7 @@ def run(rank, n_gpus, opt, manager):
     diffusion_model = create_model(opt, manager)
     # Data
     dataset = create_dataset(opt, manager)
-    data = iter(create_dataloader(dataset, opt))
+    data = create_dataloader_generator(dataset, opt)
 
     logger.info("=============== Training ===============")
     if manager.is_master():

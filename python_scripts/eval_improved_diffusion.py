@@ -12,7 +12,7 @@ import logging
 from utils import dist_util
 import torch.distributed as dist
 from models import create_model
-from data import create_dataset, create_dataloader
+from data import create_dataset, create_dataloader_generator
 
 
 
@@ -49,7 +49,7 @@ def run(rank, n_gpus, opt, manager):
 
     # Data
     dataset = create_dataset(opt, manager)
-    data = iter(create_dataloader(dataset, opt))
+    data = create_dataloader_generator(dataset, opt)
 
     if manager.is_master():
         manager._third_party_tools = ('tensorboard',)

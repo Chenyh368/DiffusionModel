@@ -39,7 +39,7 @@ def create_dataset(opt, manager):
     logger.warn(f"======> length of dataset in rank {manager.get_rank()}: {len(dataset)}")
     return dataset
 
-def create_dataloader(dataset, opt):
+def create_dataloader_generator(dataset, opt):
     dataloader = torch.utils.data.DataLoader(
         dataset,
         batch_size=opt.train.batch_size,
@@ -47,6 +47,6 @@ def create_dataloader(dataset, opt):
         num_workers=1,
         drop_last=True)
 
-    return dataloader
-
+    while True:
+        yield from dataloader
 
