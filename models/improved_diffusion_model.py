@@ -285,6 +285,7 @@ class Trainer():
                 losses = compute_losses()
             else:
                 with self.ddp_model.no_sync():
+                    # Not syn buffer ?
                     losses = compute_losses()
 
             if isinstance(self.schedule_sampler, LossAwareSampler):
@@ -293,9 +294,6 @@ class Trainer():
                 )
 
             loss = (losses["loss"] * weights).mean()
-            # log_loss_dict(
-            #     self.logger, self.diffusion, t, {k: v * weights for k, v in losses.items()}
-            # )
             if self.manager.is_master():
                 for key, values in losses.items():
                     self.manager.log_metric(key, values.mean().item(), self.step, split="Train")
