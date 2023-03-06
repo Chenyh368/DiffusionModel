@@ -21,7 +21,7 @@ class Options():
         parser.add_argument('--dataset_dir', type=str, default='cifar10/')
         # ============== Model =====================
         parser.add_argument('--model_name', type=str, default='improved_diffusion',
-                            help='chooses which model to use. [improved_gaussian_diffusion |]')
+                            help='chooses which model to use. [improved_gaussian_diffusion | autoencoder_kl]')
         # ============== Additional =====================
         parser.add_argument('--mode', default="train", type=str, choices=['train', 'eval'])
 

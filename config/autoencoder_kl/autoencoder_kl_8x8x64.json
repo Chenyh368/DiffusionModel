@@ -1,0 +1,43 @@
+{
+  "addition": {
+    "ckpt_path": null,
+    "image_key": "image",
+    "colorize_nlabels": null
+  },
+  "model": {
+    "base_learning_rate": 4.5e-6,
+    "params": {
+      "embed_dim": 64,
+      "colorize_nlabels": null,
+      "lossconfig":{
+        "target": "LPIPSWithDiscriminator",
+        "params": {
+          "disc_start": 50001,
+          "kl_weight": 0.000001,
+          "disc_weight": 0.5
+        }
+      },
+      "ddconfig": {
+        "double_z": true,
+        "z_channels": 64,
+        "resolution": 256,
+        "in_channels": 3,
+        "out_ch": 3,
+        "ch": 128,
+        "ch_mult": [1, 1, 2, 2, 4, 4],
+        "num_res_blocks": 2,
+        "attn_resolutions": [16, 8],
+        "dropout": 0.0
+      }
+    }
+  },
+  "data": {
+    "params":{
+      "batch_size": 12,
+      "warp": true,
+      "train":{
+
+      }
+    }
+  }
+}
