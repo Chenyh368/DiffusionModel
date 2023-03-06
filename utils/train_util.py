@@ -43,3 +43,10 @@ def log_loss_dict(logger, diffusion, ts, losses):
         for sub_t, sub_loss in zip(ts.cpu().numpy(), values.detach().cpu().numpy()):
             quartile = int(4 * sub_t / diffusion.num_timesteps)
             logger.logkv_mean(f"{key}_q{quartile}", sub_loss)
+
+def print_networks(net, logger):
+    name = net.__class__.__name__
+    num_params = 0
+    for param in net.parameters():
+        num_params += param.numel()
+    logger.info('======> [Network %s] Total number of parameters : %.3f M' % (name, num_params / 1e6))

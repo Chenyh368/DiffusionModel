@@ -35,6 +35,7 @@ class ImprovedDiffusionModel(BaseModel):
         BaseModel.__init__(self, opt, manager)
         self.local_rank = manager.get_rank()
         self.U_net = self._create_unet().to(self.local_rank)
+        print_networks(self.U_net, manager.get_logger())
         self.diffusion = self._create_diffusion()
 
     def _create_unet(self):
